@@ -15,9 +15,10 @@
         </xd:desc>
     </xd:doc>
     
-    <xsl:variable name="vFileId" select="tei:TEI/@xml:id"/>
-    <xsl:variable name="vgFileUrl" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>
-    <xsl:variable name="vN" select="'&#x0A;'"/>
-    <xsl:param name="pLang" select="'ar'"/>
+    <xsl:variable name="v_id-file" select="tei:TEI/@xml:id"/>
+    <xsl:variable name="v_url-file" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>
+    <xsl:variable name="v_new-line" select="'&#x0A;'"/>
+    <xsl:param name="p_lang" select="'ar'"/>
+    <xsl:param name="p_display-editorial-corrections" select="false()"/>
     
 </xsl:stylesheet>

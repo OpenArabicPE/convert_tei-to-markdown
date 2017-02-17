@@ -16,7 +16,7 @@
 
     <!-- save as new file -->
     <xsl:template match="/">
-        <xsl:result-document href="../md/{$vFileId}.md">
+        <xsl:result-document href="../md/{$v_id-file}.md">
             <xsl:apply-templates select="descendant::tei:teiHeader"/>
             <xsl:apply-templates select="descendant::tei:text" mode="mPlainText"/>
             <xsl:call-template name="t_notes"/>

@@ -24,7 +24,7 @@
     
     <xsl:template
         match="tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] | tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']">
-        <xsl:variable name="vLang" select="$pLang"/>
+        <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
         <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
         <!-- Need information on edition, date of edition, editors, transcribers etc.  -->
@@ -56,7 +56,7 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="vUrl" select="concat($vgFileUrl, '#', @xml:id)"/>
+        <xsl:variable name="vUrl" select="concat($v_url-file, '#', @xml:id)"/>
         <xsl:variable name="v_issue">
             <xsl:choose>
                 <!-- check for correct encoding of issue information -->
@@ -108,16 +108,16 @@
         <xsl:variable name="vPublisher" select="$vBiblStructSource/tei:monogr/tei:imprint/tei:publisher/tei:orgName[@xml:lang = $vLang]"/>
         
         <!-- generate the md file -->
-<!--        <xsl:result-document href="../jekyll/_posts/{concat($vPublDate/@when,'-',translate($vArticleTitle,' ','-'),'-',$vFileId,'-',@xml:id)}.md" method="text">-->
-        <xsl:result-document href="../md/{concat($vFileId,'-',@xml:id)}.md" method="text">
+<!--        <xsl:result-document href="../jekyll/_posts/{concat($vPublDate/@when,'-',translate($vArticleTitle,' ','-'),'-',$v_id-file,'-',@xml:id)}.md" method="text">-->
+        <xsl:result-document href="../md/{concat($v_id-file,'-',@xml:id)}.md" method="text">
             
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
-            <xsl:text>---</xsl:text><xsl:value-of select="$vN"/>
-            <xsl:text>title: "*</xsl:text><xsl:value-of select="$vArticleTitle"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$vN"/>
-            <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$vN"/>
-            <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$vN"/>
-            <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($vFileId,'-',@xml:id,'.bib')"/><xsl:value-of select="$vN"/>
-            <xsl:text>---</xsl:text><xsl:value-of select="$vN"/><xsl:value-of select="$vN"/>
+            <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
+            <xsl:text>title: "*</xsl:text><xsl:value-of select="$vArticleTitle"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
+            <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
+            <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
+            <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
+            <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
             <xsl:apply-templates mode="mPlainText"/>
         </xsl:result-document>
     </xsl:template>
