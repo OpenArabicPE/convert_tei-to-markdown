@@ -19,7 +19,7 @@
     
     <!-- heads -->
     
-    <xsl:template match="tei:head">
+    <xsl:template match="tei:head" mode="mPlainText">
         <!-- establish the level of nesting -->
         <xsl:variable name="v_level" select="number(count(ancestor::tei:div))"/>
         <xsl:value-of select="$vN"/>
@@ -41,12 +41,13 @@
                 <xsl:text></xsl:text>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:value-of select="."/><xsl:value-of select="$vN"/>
+        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:value-of select="$vN"/>
         <xsl:value-of select="$vN"/>
     </xsl:template>
     
-    <!-- paragraphs, lines -->
-    <xsl:template match="tei:p | tei:l" mode="mPlainText">
+    <!-- paragraphs, lines and other block-level elements -->
+    <xsl:template match="tei:p | tei:l | tei:byline | tei:closer | tei:opener | tei:salute" mode="mPlainText">
         <xsl:value-of select="$vN"/>
         <xsl:apply-templates mode="mPlainText"/>
         <xsl:value-of select="$vN"/>
@@ -68,33 +69,80 @@
         <xsl:value-of select="$vN"/>
         <xsl:apply-templates mode="mPlainText"/>
         <xsl:value-of select="$vN"/>
+        <xsl:value-of select="$vN"/>
     </xsl:template>
-    <xsl:template match="tei:row[@role='label']">
+    <xsl:template match="tei:row[@role='label']" mode="mPlainText">
         <xsl:value-of select="$vN"/>
         <xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
         </xsl:for-each>
+        <!-- dividing row -->
         <xsl:value-of select="$vN"/>
         <xsl:for-each select="tei:cell">
             <xsl:text>-</xsl:text><xsl:if test="position()!=last()"><xsl:text>|</xsl:text></xsl:if>
         </xsl:for-each>
     </xsl:template>
-    <xsl:template match="tei:row[@role='data']">
+    <xsl:template match="tei:row[@role='data']" mode="mPlainText">
         <xsl:value-of select="$vN"/>
         <xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
         </xsl:for-each>
     </xsl:template>
+    
+    <!-- lists -->
+    <xsl:template match="tei:list" mode="mPlainText">
+        <xsl:value-of select="$vN"/>
+        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:value-of select="$vN"/>
+        <xsl:value-of select="$vN"/>
+    </xsl:template>
+    <xsl:template match="tei:list/tei:item" mode="mPlainText">
+        <xsl:value-of select="$vN"/>
+        <xsl:text>- </xsl:text><xsl:apply-templates mode="mPlainText"/>
+    </xsl:template>
+    
+    <!-- notes -->
+    <xsl:template match="tei:note" mode="mPlainText">
+        <xsl:variable name="v_number" select="number(count(preceding::tei:note[ancestor::tei:text]))+1"/>
+        <xsl:text> [^</xsl:text><xsl:value-of select="$v_number"/><xsl:text>]</xsl:text>
+    </xsl:template>
+    <xsl:template name="t_notes">
+        <xsl:value-of select="$vN"/>
+        <xsl:value-of select="$vN"/>
+        <xsl:text># notes</xsl:text>
+        <xsl:value-of select="$vN"/>
+        <xsl:apply-templates select="descendant::tei:note" mode="mNotes"/>
+    </xsl:template>
+    <xsl:template match="tei:note" mode="mNotes">
+        <xsl:variable name="v_number" select="number(count(preceding::tei:note[ancestor::tei:text]))+1"/>
+        <xsl:value-of select="$vN"/>
+        <xsl:text> [^</xsl:text><xsl:value-of select="$v_number"/><xsl:text>]: </xsl:text><xsl:apply-templates mode="mPlainText"/>
+    </xsl:template>
+    
+    <!-- foreign -->
+    <!--<xsl:template match="tei:foreign" mode="mPlainText">
+        <xsl:text>*</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>*</xsl:text>
+    </xsl:template>-->
+    <!-- @rend: brackets and quotations marks -->
+    <xsl:template match="*[@rend='brackets']" mode="mPlainText" priority="100">
+        <xsl:text>(</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>)</xsl:text>
+    </xsl:template>
+    <xsl:template match="*[@rend='quotation-marks']" mode="mPlainText" priority="100">
+        <xsl:text>"</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>"</xsl:text>
+    </xsl:template>
+    
+    <!-- gap -->
+    <xsl:template match="tei:gap">
+        <xsl:text> [...] </xsl:text>
+    </xsl:template>
 
     <!-- plain text -->
     <xsl:template match="text()" mode="mPlainText">
-        <!--<xsl:text> </xsl:text>--><xsl:value-of select="normalize-space(.)"/><!--<xsl:text> </xsl:text>-->
+        <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
+        <xsl:text> </xsl:text><xsl:value-of select="normalize-space(.)"/><xsl:text> </xsl:text>
     </xsl:template>
-
-    <!-- prevent notes in div/head from producing output -->
-    <xsl:template match="tei:head/tei:note" mode="mPlainText"/>
-    <!-- prevent output from sections of articles -->
-    <xsl:template match="tei:div[@type = 'section'][ancestor::tei:div[@type = 'article']]"/>
+    <!-- prevent output from sections of articles. Why would one do that? -->
+<!--    <xsl:template match="tei:div[@type = 'section'][ancestor::tei:div[@type = 'article']]" mode="mPlainText"/>-->
 
 
 </xsl:stylesheet>
