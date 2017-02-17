@@ -6,7 +6,7 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     version="2.0">
-    <xsl:output method="text" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
+    <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
     
     <xd:doc scope="stylesheet">
@@ -15,16 +15,15 @@
         </xd:desc>
     </xd:doc>
 
-    <xsl:variable name="vFileId" select="tei:TEI/@xml:id"/>
-    <xsl:variable name="vgFileUrl" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>
-    <xsl:variable name="vN" select="'&#x0A;'"/>
-    <xsl:param name="pLang" select="'ar'"/>
+    <xsl:include href="Tei2Md-parameters.xsl"/>
     
     <!-- heads -->
     
     <xsl:template match="tei:head">
         <!-- establish the level of nesting -->
         <xsl:variable name="v_level" select="number(count(ancestor::tei:div))"/>
+        <xsl:value-of select="$vN"/>
+        <xsl:value-of select="$vN"/>
         <xsl:choose>
             <xsl:when test="$v_level =1">
                 <xsl:text># </xsl:text>
