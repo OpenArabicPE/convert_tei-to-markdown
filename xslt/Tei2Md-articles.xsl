@@ -18,7 +18,7 @@
     <xsl:include href="Tei2Md-functions.xsl"/>
 
     <xsl:template match="/">
-            <xsl:apply-templates select="descendant::tei:text/tei:body/descendant::tei:div"/>
+            <xsl:apply-templates select="descendant::tei:text" mode="mPlainText"/>
     </xsl:template>
 
     
