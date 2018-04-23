@@ -22,7 +22,7 @@
 
     
     <xsl:template
-        match="tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] | tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']">
+        match="tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] | tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']" mode="mPlainText">
         <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
         <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
@@ -112,7 +112,7 @@
             
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
-            <xsl:text>title: "*</xsl:text><xsl:value-of select="$vArticleTitle"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
+            <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
