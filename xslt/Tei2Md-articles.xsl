@@ -20,9 +20,10 @@
             <xsl:apply-templates select="descendant::tei:text" mode="mPlainText"/>
     </xsl:template>
 
-    
+    <!-- there should be no MD file for sections -->
+    <!-- tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] |  -->
     <xsl:template
-        match="tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] | tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']" mode="mPlainText">
+        match="tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']" mode="mPlainText">
         <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
         <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
@@ -108,15 +109,17 @@
         
         <!-- generate the md file -->
 <!--        <xsl:result-document href="../jekyll/_posts/{concat($vPublDate/@when,'-',translate($vArticleTitle,' ','-'),'-',$v_id-file,'-',@xml:id)}.md" method="text">-->
-        <xsl:result-document href="../md/{concat($v_id-file,'-',@xml:id)}.md" method="text">
+        <xsl:result-document href="../_output/md/{concat($v_id-file,'-',@xml:id)}.md" method="text">
             
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
+            <xsl:if test="$p_include-yaml = true()">
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
+            </xsl:if>
             <xsl:apply-templates mode="mPlainText"/>
         </xsl:result-document>
     </xsl:template>
