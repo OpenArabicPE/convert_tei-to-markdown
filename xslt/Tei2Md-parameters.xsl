@@ -19,5 +19,7 @@
     <xsl:variable name="v_new-line" select="'&#x0A;'"/>
     <xsl:param name="p_lang" select="'ar'"/>
     <xsl:param name="p_display-editorial-corrections" select="false()"/>
+    <!-- toggle the YAML block at the beginning of each file -->
+    <xsl:param name="p_include-yaml" select="false()"/>
     
 </xsl:stylesheet>
