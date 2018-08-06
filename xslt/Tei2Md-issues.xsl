@@ -18,7 +18,7 @@
     <xsl:template match="/">
         <xsl:result-document href="../md/{$v_id-file}.md">
             <xsl:apply-templates select="descendant::tei:teiHeader"/>
-            <xsl:apply-templates select="descendant::tei:text" mode="mPlainText"/>
+            <xsl:apply-templates select="descendant::tei:text/tei:body" mode="mPlainText"/>
             <xsl:call-template name="t_notes"/>
         </xsl:result-document>
     </xsl:template>
@@ -42,17 +42,13 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="vPubDate" select="$vSourceBibl/tei:monogr/tei:imprint/tei:date[1]/@when"/>
-<xsl:text>---
-</xsl:text>
-<xsl:text>title: "</xsl:text><xsl:value-of select="$vPubTitle"/><xsl:text>"</xsl:text>
-<xsl:text>
-author: </xsl:text><xsl:value-of select="$vAuthor"/>
-<xsl:text>
-date: </xsl:text><xsl:value-of select="$vPubDate"/>
-<xsl:text>
----
-
-</xsl:text> 
+        <xsl:if test="$p_include-yaml = true()">
+<xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
+<xsl:text>title: "</xsl:text><xsl:value-of select="$vPubTitle"/><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
+<xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
+<xsl:text>date: </xsl:text><xsl:value-of select="$vPubDate"/><xsl:value-of select="$v_new-line"/>
+<xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/> 
+        </xsl:if>
     </xsl:template>
     
     <!-- add whitespace for breaking whitespace -->
