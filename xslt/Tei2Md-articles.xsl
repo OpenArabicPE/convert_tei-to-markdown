@@ -23,7 +23,10 @@
     <!-- there should be no MD file for sections -->
     <!-- tei:div[@type = 'section'][not(ancestor::tei:div[@type = 'article'])] |  -->
     <xsl:template
-        match="tei:div[@type = 'article'][not(ancestor::tei:div[@type = 'bill'])] | tei:div[@type = 'bill']" mode="mPlainText">
+        match=" tei:div[@type = ('article', 'item')][not(ancestor::tei:div[@type = 'bill'])] | 
+         tei:div[@type = ('article', 'item')][not(ancestor::tei:div[@type = 'item'][@subtype='bill'])] | 
+        tei:div[@type = 'bill'] | 
+        tei:div[@type = 'item'][@subtype='bill']" mode="mPlainText">
         <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
         <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
