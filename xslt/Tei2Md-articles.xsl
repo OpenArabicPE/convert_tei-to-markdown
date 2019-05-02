@@ -49,6 +49,17 @@
         </xsl:variable>
         <xsl:variable name="vAuthor">
             <xsl:choose>
+                        <xsl:when test="tei:byline/descendant::tei:persName">
+                            <xsl:copy-of select="tei:byline/descendant::tei:persName"/>
+                        </xsl:when>
+                        <xsl:when test="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author">
+                            <xsl:copy-of select="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author/descendant::tei:persName"/>
+                        </xsl:when>
+                        <xsl:when test="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']">
+                            <xsl:copy-of select="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']"/>
+                        </xsl:when>
+                    </xsl:choose>
+            <!--<xsl:choose>
                 <xsl:when test="child::tei:byline/tei:persName/tei:surname">
                     <xsl:value-of select="child::tei:byline/tei:persName/tei:surname"/>
                     <xsl:text>, </xsl:text>
@@ -57,7 +68,7 @@
                 <xsl:when test="child::tei:byline/tei:persName">
                     <xsl:value-of select="child::tei:byline/tei:persName"/>
                 </xsl:when>
-            </xsl:choose>
+            </xsl:choose>-->
         </xsl:variable>
         <xsl:variable name="vUrl" select="concat($v_url-file, '#', @xml:id)"/>
         <xsl:variable name="v_issue">
@@ -119,7 +130,19 @@
                 </xsl:when>
                 <xsl:when test="$p_output-format = 'stylo'">
                     <!-- author, file, div -->
-                    <xsl:value-of select="concat('stylo/',if($vAuthor!='') then(tokenize($vAuthor,',')[1]) else('NN'),'-',$v_id-file,'-',@xml:id,'.txt')"/>
+                    <xsl:value-of select="'stylo/'"/>
+                    <xsl:choose>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
+                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
+                        </xsl:when>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName">
+                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:persName"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>NN</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:value-of select="concat('-',$v_id-file,'-',@xml:id,'.txt')"/>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
@@ -138,12 +161,21 @@
             <xsl:if test="$v_include-yaml = true()">
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
-            <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
+            <xsl:text>author: </xsl:text><xsl:apply-templates select="$vAuthor" mode="mPlainText"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
             </xsl:if>
+            <!-- text body -->
             <xsl:apply-templates mode="mPlainText"/>
+            <!-- notes -->
+            <xsl:choose>
+                <xsl:when test="$p_output-format = 'stylo'"/>
+                <xsl:otherwise>
+                    <xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
+                    <xsl:call-template name="t_notes"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:result-document>
     </xsl:template>
 

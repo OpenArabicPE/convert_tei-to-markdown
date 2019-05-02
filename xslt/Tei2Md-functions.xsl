@@ -145,7 +145,14 @@
     <xsl:template name="t_links">
         <xsl:param name="p_content"/>
         <xsl:param name="p_url"/>
-        <xsl:text>[</xsl:text><xsl:apply-templates select="$p_content" mode="mPlainText"/><xsl:text>](</xsl:text><xsl:value-of select="$p_url"/><xsl:text>)</xsl:text>
+        <xsl:choose>
+            <xsl:when test="$p_output-format = 'stylo'">
+                <xsl:apply-templates select="$p_content" mode="mPlainText"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>[</xsl:text><xsl:apply-templates select="$p_content" mode="mPlainText"/><xsl:text>](</xsl:text><xsl:value-of select="$p_url"/><xsl:text>)</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template match="tei:ref[@target]" mode="mPlainText">
