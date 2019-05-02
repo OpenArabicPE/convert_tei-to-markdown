@@ -112,10 +112,30 @@
         
         <!-- generate the md file -->
 <!--        <xsl:result-document href="../jekyll/_posts/{concat($vPublDate/@when,'-',translate($vArticleTitle,' ','-'),'-',$v_id-file,'-',@xml:id)}.md" method="text">-->
-        <xsl:result-document href="../_output/md/{concat($v_id-file,'-',@xml:id)}.md" method="text">
-            
+        <xsl:variable name="v_file-name">
+            <xsl:choose>
+                <xsl:when test="$p_output-format = 'md'">
+                    <xsl:value-of select="concat('md/',$v_id-file,'-',@xml:id,'.md')"/>
+                </xsl:when>
+                <xsl:when test="$p_output-format = 'stylo'">
+                    <!-- author, file, div -->
+                    <xsl:value-of select="concat('stylo/',if($vAuthor!='') then(tokenize($vAuthor,',')[1]) else('NN'),'-',$v_id-file,'-',@xml:id,'.txt')"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="v_include-yaml">
+            <xsl:choose>
+                <xsl:when test="$p_output-format = 'stylo'">
+                    <xsl:value-of select="false()"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$p_include-yaml"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:result-document href="../_output/{$v_file-name}" method="text">
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
-            <xsl:if test="$p_include-yaml = true()">
+            <xsl:if test="$v_include-yaml = true()">
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
