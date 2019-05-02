@@ -72,20 +72,26 @@
     </xsl:template>
     <xsl:template match="tei:row[@role='label']" mode="mPlainText">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:for-each select="tei:cell">
+        <xsl:apply-templates mode="mPlainText"/>
+        <!--<xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
-        </xsl:for-each>
+        </xsl:for-each>-->
         <!-- dividing row -->
         <xsl:value-of select="$v_new-line"/>
         <xsl:for-each select="tei:cell">
-            <xsl:text>-</xsl:text><xsl:if test="position()!=last()"><xsl:text>|</xsl:text></xsl:if>
+            <xsl:text>|-</xsl:text><xsl:if test="last()"><xsl:text>|</xsl:text></xsl:if>
         </xsl:for-each>
     </xsl:template>
     <xsl:template match="tei:row[@role='data']" mode="mPlainText">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:for-each select="tei:cell">
+        <xsl:apply-templates mode="mPlainText"/>
+        <!--<xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
-        </xsl:for-each>
+        </xsl:for-each>-->
+    </xsl:template>
+    
+    <xsl:template match="tei:cell" mode="mPlainText">
+        <xsl:text>| </xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:if test="last()"><xsl:text> |</xsl:text></xsl:if>
     </xsl:template>
     
     <!-- lists -->
