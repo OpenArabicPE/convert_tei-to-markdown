@@ -108,8 +108,13 @@
     
     <!-- notes -->
     <xsl:template match="tei:note" mode="mPlainText">
-        <xsl:variable name="v_number" select="number(count(preceding::tei:note[ancestor::tei:text]))+1"/>
+        <xsl:choose>
+            <xsl:when test="$p_output-format = 'stylo'"/>
+            <xsl:otherwise>
+                <xsl:variable name="v_number" select="number(count(preceding::tei:note[ancestor::tei:text]))+1"/>
         <xsl:text>[^</xsl:text><xsl:value-of select="$v_number"/><xsl:text>]</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template name="t_notes">
         <xsl:value-of select="$v_new-line"/>
