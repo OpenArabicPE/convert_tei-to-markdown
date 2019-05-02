@@ -21,5 +21,7 @@
     <xsl:param name="p_display-editorial-corrections" select="false()"/>
     <!-- toggle the YAML block at the beginning of each file -->
     <xsl:param name="p_include-yaml" select="false()"/>
+    <!-- values for $p_output-format are: md and stylo -->
+    <xsl:param name="p_output-format" select="'stylo'"/>
     
 </xsl:stylesheet>
