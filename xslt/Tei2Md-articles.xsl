@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oape="https://openarabicpe.github.io/ns"
     xmlns:tei="http://www.tei-c.org/ns/1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
@@ -132,6 +133,10 @@
                     <!-- author, file, div -->
                     <xsl:value-of select="'stylo/'"/>
                     <xsl:choose>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
+                            <xsl:text>oape_</xsl:text>
+                            <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
+                        </xsl:when>
                         <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
                             <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
                         </xsl:when>

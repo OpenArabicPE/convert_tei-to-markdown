@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oape="https://openarabicpe.github.io/ns"
     xmlns:tei="http://www.tei-c.org/ns/1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
-    version="2.0">
+    version="3.0">
+    <!-- import functions -->
+    <xsl:import href="../../tools/xslt/openarabicpe_functions.xsl"/>
     <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
     
@@ -13,8 +16,19 @@
             <xd:p>This stylesheet provides functions/templates for converting TEI XML to (multi)markdown</xd:p>
         </xd:desc>
     </xd:doc>
-
+    
+    
     <xsl:include href="Tei2Md-parameters.xsl"/>
+    
+    <!-- locate authority files -->
+    <xsl:param name="p_path-authority-files" select="'../../authority-files/data/tei/'"/>
+    <xsl:param name="p_file-name-gazetteer" select="'gazetteer_levant-phd.TEIP5.xml'"/>
+    <xsl:param name="p_file-name-personography" select="'personography_OpenArabicPE.TEIP5.xml'"/>
+     <!-- load the authority files -->
+    <xsl:variable name="v_gazetteer"
+        select="doc(concat($p_path-authority-files, $p_file-name-gazetteer))"/>
+    <xsl:variable name="v_personography"
+        select="doc(concat($p_path-authority-files, $p_file-name-personography))"/>
     
     <!-- heads -->
     

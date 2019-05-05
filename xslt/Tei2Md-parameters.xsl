@@ -23,5 +23,6 @@
     <xsl:param name="p_include-yaml" select="false()"/>
     <!-- values for $p_output-format are: md and stylo -->
     <xsl:param name="p_output-format" select="'stylo'"/>
+    <xsl:param name="p_verbose" select="false()"/>
     
 </xsl:stylesheet>
