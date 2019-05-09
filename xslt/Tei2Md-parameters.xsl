@@ -14,7 +14,7 @@
         </xd:desc>
     </xd:doc>
     
-    <xsl:variable name="v_id-file" select="tei:TEI/@xml:id"/>
+    <xsl:variable name="v_id-file" select="if(tei:TEI/@xml:id) then(tei:TEI/@xml:id) else( tokenize(base-uri(),'/')[last()])"/>
     <xsl:variable name="v_url-file" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>
     <xsl:variable name="v_new-line" select="'&#x0A;'"/>
     <xsl:param name="p_lang" select="'ar'"/>
