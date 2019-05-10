@@ -134,7 +134,7 @@
                     <xsl:value-of select="'stylo/'"/>
                     <xsl:choose>
                         <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
-                            <xsl:text>oape_</xsl:text>
+                            <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
                             <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
                         </xsl:when>
                         <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
@@ -147,7 +147,7 @@
                             <xsl:text>NN</xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:value-of select="concat('-',$v_id-file,'-',@xml:id,'.txt')"/>
+                    <xsl:value-of select="concat($v_separator-attribute-key,$v_id-file,$v_separator-attribute-key,@xml:id,'.txt')"/>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>

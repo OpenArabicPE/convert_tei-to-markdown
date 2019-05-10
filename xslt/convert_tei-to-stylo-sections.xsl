@@ -15,6 +15,9 @@
     </xd:doc>
 
     <xsl:include href="Tei2Md-functions.xsl"/>
+    
+    <!-- variables -->
+    <xsl:param name="p_min-section-length" select="3"/>
 
     <!-- save as new file -->
     <xsl:template match="/">
@@ -24,27 +27,6 @@
 <!--            <xsl:call-template name="t_notes"/>-->
         </xsl:result-document>
     </xsl:template>
-    
-    <!-- variables -->
-    <xsl:param name="p_min-section-length" select="3"/>
-     <xsl:variable name="vLang" select="'ar'"/>
-        <xsl:variable name="vSourceBibl"
-            select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct"/>
-        <xsl:variable name="vPubTitle" select="$vSourceBibl/tei:monogr/tei:title[@xml:lang=$vLang][not(@type='sub')][1]"/>
-<!--        <xsl:variable name="vAuthor1" select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>-->
-        <xsl:variable name="vAuthor">
-            <xsl:choose>
-                <xsl:when test="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname">
-                    <xsl:value-of select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname"/>
-                    <xsl:text>, </xsl:text>
-                    <xsl:value-of select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:forename"/>
-                </xsl:when>
-                <xsl:when test="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]">
-                    <xsl:value-of select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>
-                </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="vPubDate" select="$vSourceBibl/tei:monogr/tei:imprint/tei:date[1]/@when"/>
     <xsl:variable name="v_file-name">
             <xsl:choose>
                 <xsl:when test="$p_output-format = 'md'">
@@ -55,7 +37,7 @@
                     <xsl:value-of select="'stylo/'"/>
                     <xsl:choose>
                         <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
-                            <xsl:text>oape_</xsl:text>
+                            <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
                             <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
                         </xsl:when>
                         <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
@@ -68,18 +50,8 @@
                             <xsl:text>NN</xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:value-of select="concat('-',$v_id-file,'-sections.txt')"/>
+                    <xsl:value-of select="concat($v_separator-attribute-key, $v_id-file,$v_separator-attribute-key,'v',$v_separator-attribute-value,$v_volume,$v_separator-attribute-key,'i',$v_separator-attribute-value, $v_issue,$v_separator-attribute-key,'sections.txt')"/>
                 </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="v_include-yaml">
-            <xsl:choose>
-                <xsl:when test="$p_output-format = 'stylo'">
-                    <xsl:value-of select="false()"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="$p_include-yaml"/>
-                </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
 

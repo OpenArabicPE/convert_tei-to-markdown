@@ -30,6 +30,65 @@
     <xsl:variable name="v_personography"
         select="doc(concat($p_path-authority-files, $p_file-name-personography))"/>
     
+    <!-- variables for filenames -->
+    <!-- variables -->
+     <xsl:variable name="vLang" select="'ar'"/>
+        <xsl:variable name="vBiblStructSource"
+            select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct"/>
+        <xsl:variable name="vPubTitle" select="$vBiblStructSource/tei:monogr/tei:title[@xml:lang=$vLang][not(@type='sub')][1]"/>
+<!--        <xsl:variable name="vAuthor1" select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>-->
+        <xsl:variable name="vAuthor">
+            <xsl:choose>
+                <xsl:when test="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname">
+                    <xsl:value-of select="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname"/>
+                    <xsl:text>, </xsl:text>
+                    <xsl:value-of select="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:forename"/>
+                </xsl:when>
+                <xsl:when test="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]">
+                    <xsl:value-of select="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="vPubDate" select="$vBiblStructSource/tei:monogr/tei:imprint/tei:date[1]/@when"/>
+    <xsl:variable name="v_issue">
+            <xsl:choose>
+                <!-- check for correct encoding of issue information -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from = $vBiblStructSource//tei:biblScope[@unit = 'issue']/@to">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from"/>
+                </xsl:when>
+                <!-- check for ranges -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from != $vBiblStructSource//tei:biblScope[@unit = 'issue']/@to">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from"/>
+                    <!-- probably an en-dash is the better option here -->
+                    <xsl:text>/</xsl:text>
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@to"/>
+                </xsl:when>
+                <!-- fallback: erroneous encoding of issue information with @n -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@n">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@n"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="v_volume">
+            <xsl:choose>
+                <!-- check for correct encoding of volume information -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from = $vBiblStructSource//tei:biblScope[@unit = 'volume']/@to">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from"/>
+                </xsl:when>
+                <!-- check for ranges -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from != $vBiblStructSource//tei:biblScope[@unit = 'volume']/@to">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from"/>
+                    <!-- probably an en-dash is the better option here -->
+                    <xsl:text>/</xsl:text>
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@to"/>
+                </xsl:when>
+                <!-- fallback: erroneous encoding of volume information with @n -->
+                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n">
+                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+    
     <!-- heads -->
     
     <xsl:template match="tei:head" mode="mPlainText">
