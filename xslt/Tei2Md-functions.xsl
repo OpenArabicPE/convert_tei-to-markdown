@@ -34,7 +34,7 @@
     <!-- variables -->
      <xsl:variable name="vLang" select="'ar'"/>
         <xsl:variable name="vBiblStructSource"
-            select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct"/>
+            select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct[1]"/>
         <xsl:variable name="vPubTitle" select="$vBiblStructSource/tei:monogr/tei:title[@xml:lang=$vLang][not(@type='sub')][1]"/>
 <!--        <xsl:variable name="vAuthor1" select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>-->
         <xsl:variable name="vAuthor">
@@ -50,6 +50,7 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="vPubDate" select="$vBiblStructSource/tei:monogr/tei:imprint/tei:date[1]/@when"/>
+    <xsl:variable name="v_id-oclc" select="$vBiblStructSource/descendant::tei:idno[@type='OCLC'][1]"/>
     <xsl:variable name="v_issue">
             <xsl:choose>
                 <!-- check for correct encoding of issue information -->
@@ -91,7 +92,7 @@
     
     <!-- heads -->
     
-    <xsl:template match="tei:head" mode="mPlainText">
+    <xsl:template match="tei:head" mode="m_markdown">
         <!-- establish the level of nesting -->
         <xsl:variable name="v_level" select="number(count(ancestor::tei:div))"/>
         <xsl:value-of select="$v_new-line"/>
@@ -113,39 +114,39 @@
                 <xsl:text></xsl:text>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <xsl:value-of select="$v_new-line"/>
         <xsl:value-of select="$v_new-line"/>
     </xsl:template>
     
     <!-- paragraphs, lines and other block-level elements -->
-    <xsl:template match="tei:p | tei:l | tei:byline | tei:closer | tei:opener | tei:salute" mode="mPlainText">
+    <xsl:template match="tei:p | tei:l | tei:byline | tei:closer | tei:opener | tei:salute" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <xsl:value-of select="$v_new-line"/>
     </xsl:template>
     
     <!-- page breaks, line breaks etc. -->
-    <xsl:template match="tei:lb | tei:cb | tei:pb" mode="mPlainText">
+    <xsl:template match="tei:lb | tei:cb | tei:pb" mode="m_markdown">
         <xsl:text> </xsl:text>
     </xsl:template>
     
     <!-- segments of a line -->
-    <xsl:template match="tei:l[@type='bayt']/tei:seg" mode="mPlainText">
-        <xsl:apply-templates mode="mPlainText"/>
+    <xsl:template match="tei:l[@type='bayt']/tei:seg" mode="m_markdown">
+        <xsl:apply-templates mode="m_markdown"/>
         <xsl:text> </xsl:text>
     </xsl:template>
     
     <!-- tables -->
-    <xsl:template match="tei:table" mode="mPlainText">
+    <xsl:template match="tei:table" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <xsl:value-of select="$v_new-line"/>
         <xsl:value-of select="$v_new-line"/>
     </xsl:template>
-    <xsl:template match="tei:row[@role='label']" mode="mPlainText">
+    <xsl:template match="tei:row[@role='label']" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <!--<xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
         </xsl:for-each>-->
@@ -155,32 +156,32 @@
             <xsl:text>|-</xsl:text><xsl:if test="last()"><xsl:text>|</xsl:text></xsl:if>
         </xsl:for-each>
     </xsl:template>
-    <xsl:template match="tei:row[@role='data']" mode="mPlainText">
+    <xsl:template match="tei:row[@role='data']" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <!--<xsl:for-each select="tei:cell">
             <xsl:apply-templates mode="mPlainText"/><xsl:if test="position()!=last()"><xsl:text> | </xsl:text></xsl:if>
         </xsl:for-each>-->
     </xsl:template>
     
-    <xsl:template match="tei:cell" mode="mPlainText">
-        <xsl:text>| </xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:if test="last()"><xsl:text> |</xsl:text></xsl:if>
+    <xsl:template match="tei:cell" mode="m_markdown">
+        <xsl:text>| </xsl:text><xsl:apply-templates mode="m_markdown"/><xsl:if test="last()"><xsl:text> |</xsl:text></xsl:if>
     </xsl:template>
     
     <!-- lists -->
-    <xsl:template match="tei:list" mode="mPlainText">
+    <xsl:template match="tei:list" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:apply-templates mode="mPlainText"/>
+        <xsl:apply-templates mode="m_markdown"/>
         <xsl:value-of select="$v_new-line"/>
         <xsl:value-of select="$v_new-line"/>
     </xsl:template>
-    <xsl:template match="tei:list/tei:item" mode="mPlainText">
+    <xsl:template match="tei:list/tei:item" mode="m_markdown">
         <xsl:value-of select="$v_new-line"/>
-        <xsl:text>- </xsl:text><xsl:apply-templates mode="mPlainText"/>
+        <xsl:text>- </xsl:text><xsl:apply-templates mode="m_markdown"/>
     </xsl:template>
     
     <!-- notes -->
-    <xsl:template match="tei:note" mode="mPlainText">
+    <xsl:template match="tei:note" mode="m_markdown">
         <xsl:choose>
             <xsl:when test="$p_output-format = 'stylo'"/>
             <xsl:otherwise>
@@ -207,15 +208,15 @@
         <xsl:text>*</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>*</xsl:text>
     </xsl:template>-->
     <!-- @rend: brackets and quotations marks -->
-    <xsl:template match="*[@rend='brackets']" mode="mPlainText" priority="100">
-        <xsl:text>(</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>)</xsl:text>
+    <xsl:template match="*[@rend='brackets']" mode="m_markdown" priority="100">
+        <xsl:text>(</xsl:text><xsl:apply-templates mode="m_markdown"/><xsl:text>)</xsl:text>
     </xsl:template>
-    <xsl:template match="*[@rend='quotation-marks']" mode="mPlainText" priority="100">
-        <xsl:text>"</xsl:text><xsl:apply-templates mode="mPlainText"/><xsl:text>"</xsl:text>
+    <xsl:template match="*[@rend='quotation-marks']" mode="m_markdown" priority="100">
+        <xsl:text>"</xsl:text><xsl:apply-templates mode="m_markdown"/><xsl:text>"</xsl:text>
     </xsl:template>
     
     <!-- gap -->
-    <xsl:template match="tei:gap" mode="mPlainText">
+    <xsl:template match="tei:gap" mode="m_markdown">
         <xsl:text> [...] </xsl:text>
     </xsl:template>
     
@@ -225,15 +226,15 @@
         <xsl:param name="p_url"/>
         <xsl:choose>
             <xsl:when test="$p_output-format = 'stylo'">
-                <xsl:apply-templates select="$p_content" mode="mPlainText"/>
+                <xsl:apply-templates select="$p_content" mode="m_plain-text"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:text>[</xsl:text><xsl:apply-templates select="$p_content" mode="mPlainText"/><xsl:text>](</xsl:text><xsl:value-of select="$p_url"/><xsl:text>)</xsl:text>
+                <xsl:text>[</xsl:text><xsl:apply-templates select="$p_content" mode="m_markdown"/><xsl:text>](</xsl:text><xsl:value-of select="$p_url"/><xsl:text>)</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     
-    <xsl:template match="tei:ref[@target]" mode="mPlainText">
+    <xsl:template match="tei:ref[@target]" mode="m_markdown">
         <xsl:call-template name="t_links">
             <xsl:with-param name="p_content">
                 <xsl:value-of select="."/>
@@ -241,7 +242,7 @@
             <xsl:with-param name="p_url" select="@target"/>
         </xsl:call-template>
     </xsl:template>
-    <xsl:template match="node()[not(self::tei:pb)][@corresp]" mode="mPlainText">
+    <xsl:template match="node()[not(self::tei:pb)][@corresp]" mode="m_markdown">
         <xsl:call-template name="t_links">
             <xsl:with-param name="p_content">
                 <xsl:value-of select="."/>
@@ -251,19 +252,19 @@
     </xsl:template>
     
     <!-- editorial corrections with choice: original mistakes are encoded as <sic> or <orig>, corrections as <corr> -->
-    <xsl:template match="tei:choice[child::tei:corr[@resp!='#org_MS']]" mode="mPlainText">
+    <xsl:template match="tei:choice[child::tei:corr[@resp!='#org_MS']]" mode="m_markdown">
         <xsl:choose>
             <xsl:when test="$p_display-editorial-corrections = true()">
-                <xsl:apply-templates select="tei:corr" mode="mPlainText"/>
+                <xsl:apply-templates select="tei:corr" mode="m_markdown"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:apply-templates select="node()[not(self::tei:corr)]" mode="mPlainText"/>
+                <xsl:apply-templates select="node()[not(self::tei:corr)]" mode="m_markdown"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <!-- plain text -->
-    <xsl:template match="text()" mode="mPlainText">
+    <xsl:template match="text()" mode="m_markdown m_plain-text" priority="10">
         <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
         <xsl:text> </xsl:text><xsl:value-of select="normalize-space(.)"/><xsl:text> </xsl:text>
     </xsl:template>

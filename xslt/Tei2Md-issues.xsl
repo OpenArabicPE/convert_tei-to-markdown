@@ -20,7 +20,7 @@
     <xsl:template match="/">
         <xsl:result-document href="../_output/{$v_file-name}">
             <xsl:apply-templates select="descendant::tei:teiHeader"/>
-            <xsl:apply-templates select="descendant::tei:text/tei:body" mode="mPlainText"/>
+            <xsl:apply-templates select="descendant::tei:text/tei:body" mode="m_markdown"/>
             <xsl:call-template name="t_notes"/>
         </xsl:result-document>
     </xsl:template>

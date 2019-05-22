@@ -23,7 +23,7 @@
     <xsl:template match="/">
         <xsl:result-document href="../_output/{$v_file-name}">
 <!--            <xsl:apply-templates select="descendant::tei:teiHeader"/>-->
-            <xsl:apply-templates select="descendant::tei:text/tei:body/tei:div[@type='section'][count(tei:div[@type = ('item', 'article')]) gt $p_min-section-length]" mode="mPlainText"/>
+            <xsl:apply-templates select="descendant::tei:text/tei:body/tei:div[@type='section'][count(tei:div[@type = ('item', 'article')]) gt $p_min-section-length]" mode="m_markdown"/>
 <!--            <xsl:call-template name="t_notes"/>-->
         </xsl:result-document>
     </xsl:template>

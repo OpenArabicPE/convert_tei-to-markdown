@@ -18,7 +18,7 @@
     <xsl:include href="Tei2Md-functions.xsl"/>
 
     <xsl:template match="/">
-            <xsl:apply-templates select="descendant::tei:text" mode="mPlainText"/>
+            <xsl:apply-templates select="descendant::tei:text" mode="m_markdown"/>
     </xsl:template>
 
     <!-- there should be no MD file for sections -->
@@ -27,7 +27,7 @@
         match=" tei:div[@type = ('article', 'item')][not(ancestor::tei:div[@type = 'bill'])] | 
          tei:div[@type = ('article', 'item')][not(ancestor::tei:div[@type = 'item'][@subtype='bill'])] | 
         tei:div[@type = 'bill'] | 
-        tei:div[@type = 'item'][@subtype='bill']" mode="mPlainText">
+        tei:div[@type = 'item'][@subtype='bill']" mode="m_markdown">
         <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
         <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
@@ -43,10 +43,10 @@
         <xsl:variable name="vArticleTitle">
             <xsl:if test="@type = 'article' and ancestor::tei:div[@type = 'section']">
                 <xsl:apply-templates select="ancestor::tei:div[@type = 'section']/tei:head"
-                    mode="mPlainText"/>
+                    mode="m_markdown"/>
                 <xsl:text>: </xsl:text>
             </xsl:if>
-            <xsl:apply-templates select="./tei:head" mode="mPlainText"/>
+            <xsl:apply-templates select="./tei:head" mode="m_markdown"/>
         </xsl:variable>
         <xsl:variable name="vAuthor">
             <xsl:choose>
@@ -72,44 +72,6 @@
             </xsl:choose>-->
         </xsl:variable>
         <xsl:variable name="vUrl" select="concat($v_url-file, '#', @xml:id)"/>
-        <xsl:variable name="v_issue">
-            <xsl:choose>
-                <!-- check for correct encoding of issue information -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from = $vBiblStructSource//tei:biblScope[@unit = 'issue']/@to">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from"/>
-                </xsl:when>
-                <!-- check for ranges -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from != $vBiblStructSource//tei:biblScope[@unit = 'issue']/@to">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from"/>
-                    <!-- probably an en-dash is the better option here -->
-                    <xsl:text>/</xsl:text>
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@to"/>
-                </xsl:when>
-                <!-- fallback: erroneous encoding of issue information with @n -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@n">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@n"/>
-                </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="v_volume">
-            <xsl:choose>
-                <!-- check for correct encoding of volume information -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from = $vBiblStructSource//tei:biblScope[@unit = 'volume']/@to">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from"/>
-                </xsl:when>
-                <!-- check for ranges -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from != $vBiblStructSource//tei:biblScope[@unit = 'volume']/@to">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from"/>
-                    <!-- probably an en-dash is the better option here -->
-                    <xsl:text>/</xsl:text>
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@to"/>
-                </xsl:when>
-                <!-- fallback: erroneous encoding of volume information with @n -->
-                <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n">
-                    <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n"/>
-                </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
         <xsl:variable name="vPages">
             <xsl:value-of select="preceding::tei:pb[@ed = 'print'][1]/@n"/>
             <xsl:if
@@ -166,13 +128,13 @@
             <xsl:if test="$v_include-yaml = true()">
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
             <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
-            <xsl:text>author: </xsl:text><xsl:apply-templates select="$vAuthor" mode="mPlainText"/><xsl:value-of select="$v_new-line"/>
+            <xsl:text>author: </xsl:text><xsl:apply-templates select="$vAuthor" mode="m_markdown"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
             <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
             </xsl:if>
             <!-- text body -->
-            <xsl:apply-templates mode="mPlainText"/>
+            <xsl:apply-templates mode="m_markdown"/>
             <!-- notes -->
             <xsl:choose>
                 <xsl:when test="$p_output-format = 'stylo'"/>

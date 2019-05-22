@@ -11,6 +11,7 @@
     <!-- variables -->
     <xsl:param name="p_min-section-length" select="3"/>
     <xsl:param name="p_output-path" select="'_output/plain-text_pages/'"/>
+    <xsl:variable name="v_file-name" select="concat('oclc_',$v_id-oclc,'-v_', $v_volume, '-i_',$v_issue)"/>
    
     <xsl:template match="/">
         <xsl:apply-templates mode="m_page-to-file" select="descendant::tei:pb[@ed='print']"/>
@@ -21,7 +22,7 @@
         <!--<xsl:message>
             <xsl:value-of select="$v_page-number"/>
         </xsl:message>-->
-        <xsl:result-document href="{concat($p_output-path,$v_id-file,'-p_',format-number($v_page-number,'000'),'.txt')}">
+        <xsl:result-document href="{concat($p_output-path,$v_file-name,'-p_',format-number($v_page-number,'000'),'.txt')}">
             <xsl:choose>
                 <!-- all but the final page -->
                 <xsl:when test="following::tei:pb[@ed='print']">
