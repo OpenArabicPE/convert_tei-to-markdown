@@ -68,4 +68,40 @@
         </xsl:choose>
     </xsl:template>
     <xsl:template match="tei:add[@resp='#org_MS'] | tei:del[@resp='#org_MS']" mode="m_plain-text"/>
+    <xsl:template match="text()" mode="m_plain-text" priority="15">
+        <xsl:variable name="v_self" select="normalize-space(.)"/>
+        <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
+        <!--<xsl:value-of select="translate($v_self,$v_string-normalise-shamela-arabic-source, $v_string-normalise-shamela-arabic-target)"/>-->
+        <!-- remove some of the hamzas introduced by shamela.ws' transcribers -->
+        <xsl:choose>
+            <xsl:when test="matches($v_self,'(\W)إلى')">
+                <xsl:value-of select="replace($v_self,'(\W)إلى','$1الى')"/>
+            </xsl:when>
+            <xsl:when test="matches($v_self,'(\W)إلي')">
+                <xsl:value-of select="replace($v_self,'(\W)إلي','$1الي')"/>
+            </xsl:when>
+            <xsl:when test="matches($v_self,'(\W)إن')">
+                <xsl:value-of select="replace($v_self,'(\W)إن','$1ان')"/>
+            </xsl:when>
+            <xsl:when test="matches($v_self,'(\W)أن')">
+                <xsl:value-of select="replace($v_self,'(\W)أن','$1ان')"/>
+            </xsl:when>
+            <xsl:when test="matches($v_self,'(\W)إذ')">
+                <xsl:value-of select="replace($v_self,'(\W)إذ','$1اذ')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$v_self"/>
+            </xsl:otherwise>
+        </xsl:choose>
+         <xsl:choose>
+             <xsl:when test="$v_self = ' '"/>
+            <xsl:when test="ends-with($v_self,' ب')"/>
+             <xsl:when test="ends-with($v_self,' ل')"/>
+             <xsl:when test="ends-with($v_self,' ف')"/>
+             <xsl:when test="ends-with($v_self,' و')"/>
+             <xsl:otherwise>
+                 <xsl:text> </xsl:text>
+             </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 </xsl:stylesheet>

@@ -28,27 +28,10 @@
     <xsl:variable name="v_file-name">
             <xsl:choose>
                 <xsl:when test="$p_output-format = 'md'">
-                    <xsl:value-of select="concat('md/',$v_id-file,'.md')"/>
+                    <xsl:value-of select="concat($v_file-name-base,'.md')"/>
                 </xsl:when>
                 <xsl:when test="$p_output-format = 'stylo'">
-                    <!-- author, file, div -->
-                    <xsl:value-of select="'stylo/'"/>
-                    <xsl:choose>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
-                            <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
-                            <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
-                        </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
-                        </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:persName"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:text>NN</xsl:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:value-of select="concat($v_separator-attribute-key, $v_id-file,$v_separator-attribute-key,'v',$v_separator-attribute-value,$v_volume,$v_separator-attribute-key,'i',$v_separator-attribute-value, $v_issue,$v_separator-attribute-key,'.txt')"/>
+                    <xsl:value-of select="concat($v_file-name-base,'.txt')"/>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>

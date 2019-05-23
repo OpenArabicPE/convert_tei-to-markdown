@@ -30,6 +30,12 @@
     <xsl:variable name="v_personography"
         select="doc(concat($p_path-authority-files, $p_file-name-personography))"/>
     
+    <!-- variables for normalizing arabic -->
+    <xsl:variable name="v_string-normalise-stylo-arabic-source" select="'اآأإئىؤة'"/>
+    <xsl:variable name="v_string-normalise-stylo-arabic-target" select="'ااااييوت'"/>
+    <xsl:variable name="v_string-normalise-shamela-arabic-source" select="'اآأإ'"/>
+    <xsl:variable name="v_string-normalise-shamela-arabic-target" select="'اااا'"/>
+    
     <!-- variables for filenames -->
     <!-- variables -->
      <xsl:variable name="vLang" select="'ar'"/>
@@ -61,7 +67,7 @@
                 <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from != $vBiblStructSource//tei:biblScope[@unit = 'issue']/@to">
                     <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@from"/>
                     <!-- probably an en-dash is the better option here -->
-                    <xsl:text>/</xsl:text>
+                    <xsl:text>-</xsl:text>
                     <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'issue']/@to"/>
                 </xsl:when>
                 <!-- fallback: erroneous encoding of issue information with @n -->
@@ -80,12 +86,40 @@
                 <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from != $vBiblStructSource//tei:biblScope[@unit = 'volume']/@to">
                     <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@from"/>
                     <!-- probably an en-dash is the better option here -->
-                    <xsl:text>/</xsl:text>
+                    <xsl:text>-</xsl:text>
                     <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@to"/>
                 </xsl:when>
                 <!-- fallback: erroneous encoding of volume information with @n -->
                 <xsl:when test="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n">
                     <xsl:value-of select="$vBiblStructSource//tei:biblScope[@unit = 'volume']/@n"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+    
+    <xsl:variable name="v_file-name-base">
+            <xsl:choose>
+                <xsl:when test="$p_output-format = 'md'">
+                    <xsl:value-of select="concat('md/',$v_id-file)"/>
+                </xsl:when>
+                <xsl:when test="$p_output-format = 'stylo'">
+                    <!-- author, file, div -->
+                    <xsl:value-of select="'stylo/'"/>
+                    <xsl:choose>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
+                            <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
+                            <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
+                        </xsl:when>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
+                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
+                        </xsl:when>
+                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName">
+                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:persName"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>NN</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:value-of select="concat($v_separator-attribute-key, 'oclc',$v_separator-attribute-value,$v_id-oclc,$v_separator-attribute-key,'v',$v_separator-attribute-value,translate($v_volume,'/','-'),$v_separator-attribute-key,'i',$v_separator-attribute-value, $v_issue)"/>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
@@ -266,7 +300,25 @@
     <!-- plain text -->
     <xsl:template match="text()" mode="m_markdown m_plain-text" priority="10">
         <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
-        <xsl:text> </xsl:text><xsl:value-of select="normalize-space(.)"/><xsl:text> </xsl:text>
+        <xsl:variable name="v_self" select="normalize-space(.)"/>
+        <xsl:choose>
+            <xsl:when test="$p_output-format = 'stylo'">
+                <xsl:value-of select="translate($v_self, $v_string-normalise-stylo-arabic-source, $v_string-normalise-stylo-arabic-target)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$v_self"/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+             <xsl:when test="$v_self = ' '"/>
+            <xsl:when test="ends-with($v_self,' ب')"/>
+             <xsl:when test="ends-with($v_self,' ل')"/>
+             <xsl:when test="ends-with($v_self,' ف')"/>
+             <xsl:when test="ends-with($v_self,' و')"/>
+             <xsl:otherwise>
+                 <xsl:text> </xsl:text>
+             </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <!-- prevent output from sections of articles. Why would one do that? -->
 <!--    <xsl:template match="tei:div[@type = 'section'][ancestor::tei:div[@type = 'article']]" mode="mPlainText"/>-->
