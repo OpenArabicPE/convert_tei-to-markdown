@@ -119,7 +119,15 @@
                             <xsl:text>NN</xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:value-of select="concat($v_separator-attribute-key, 'oclc',$v_separator-attribute-value,$v_id-oclc,$v_separator-attribute-key,'v',$v_separator-attribute-value,translate($v_volume,'/','-'),$v_separator-attribute-key,'i',$v_separator-attribute-value, $v_issue)"/>
+                    <xsl:value-of select="$v_separator-attribute-key"/>
+                    <xsl:choose>
+                        <xsl:when test="$v_volume = ''">
+                            <xsl:value-of select="$v_id-file"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="concat('oclc',$v_separator-attribute-value,$v_id-oclc,$v_separator-attribute-key,'v',$v_separator-attribute-value,translate($v_volume,'/','-'),$v_separator-attribute-key,'i',$v_separator-attribute-value, $v_issue)"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
