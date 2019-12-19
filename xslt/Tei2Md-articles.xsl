@@ -6,7 +6,7 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     version="2.0">
-    <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
+    <xsl:output method="text" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
     
     <xd:doc scope="stylesheet">
@@ -28,61 +28,10 @@
          tei:div[@type = ('article', 'item')][not(ancestor::tei:div[@type = 'item'][@subtype='bill'])] | 
         tei:div[@type = 'bill'] | 
         tei:div[@type = 'item'][@subtype='bill']" mode="m_markdown">
-        <xsl:variable name="vLang" select="$p_lang"/>
         <!-- variables identifying the digital surrogate -->
-        <xsl:variable name="vTitleStmt" select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt"/>
-        <!-- Need information on edition, date of edition, editors, transcribers etc.  -->
-        <!-- variables identifying the original source -->
-        <xsl:variable name="vBiblStructSource"
-            select="ancestor::tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct"/>
-        <xsl:variable name="vPublDate"
-            select="$vBiblStructSource/tei:monogr/tei:imprint/tei:date[1]"/>
-        <xsl:variable name="vPublicationType" select="'Newspaper article'"/>
-        <xsl:variable name="vPublicationTitle"
-            select="$vBiblStructSource/tei:monogr/tei:title[@level = 'j'][@xml:lang = $vLang][not(@type = 'sub')]"/>
-        <xsl:variable name="vArticleTitle">
-            <xsl:if test="@type = 'article' and ancestor::tei:div[@type = 'section']">
-                <xsl:apply-templates select="ancestor::tei:div[@type = 'section']/tei:head"
-                    mode="m_markdown"/>
-                <xsl:text>: </xsl:text>
-            </xsl:if>
-            <xsl:apply-templates select="./tei:head" mode="m_markdown"/>
+        <xsl:variable name="v_author">
+            <xsl:copy-of select="oape:get-author-from-div(.)"/>
         </xsl:variable>
-        <xsl:variable name="vAuthor">
-            <xsl:choose>
-                        <xsl:when test="tei:byline/descendant::tei:persName">
-                            <xsl:copy-of select="tei:byline/descendant::tei:persName"/>
-                        </xsl:when>
-                        <xsl:when test="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author">
-                            <xsl:copy-of select="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author/descendant::tei:persName"/>
-                        </xsl:when>
-                        <xsl:when test="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']">
-                            <xsl:copy-of select="descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']"/>
-                        </xsl:when>
-                    </xsl:choose>
-            <!--<xsl:choose>
-                <xsl:when test="child::tei:byline/tei:persName/tei:surname">
-                    <xsl:value-of select="child::tei:byline/tei:persName/tei:surname"/>
-                    <xsl:text>, </xsl:text>
-                    <xsl:value-of select="child::tei:byline/tei:persName/tei:forename"/>
-                </xsl:when>
-                <xsl:when test="child::tei:byline/tei:persName">
-                    <xsl:value-of select="child::tei:byline/tei:persName"/>
-                </xsl:when>
-            </xsl:choose>-->
-        </xsl:variable>
-        <xsl:variable name="vUrl" select="concat($v_url-file, '#', @xml:id)"/>
-        <xsl:variable name="vPages">
-            <xsl:value-of select="preceding::tei:pb[@ed = 'print'][1]/@n"/>
-            <xsl:if
-                test="preceding::tei:pb[@ed = 'print'][1]/@n != descendant::tei:pb[@ed = 'print'][last()]/@n">
-                <xsl:text>-</xsl:text>
-                <xsl:value-of select="descendant::tei:pb[@ed = 'print'][last()]/@n"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="vPubPlace"
-            select="$vBiblStructSource/tei:monogr/tei:imprint/tei:pubPlace/tei:placeName[@xml:lang = $vLang]"/>
-        <xsl:variable name="vPublisher" select="$vBiblStructSource/tei:monogr/tei:imprint/tei:publisher/tei:orgName[@xml:lang = $vLang]"/>
         
         <!-- generate the md file -->
 <!--        <xsl:result-document href="../jekyll/_posts/{concat($vPublDate/@when,'-',translate($vArticleTitle,' ','-'),'-',$v_id-file,'-',@xml:id)}.md" method="text">-->
@@ -93,17 +42,20 @@
                 </xsl:when>
                 <xsl:when test="$p_output-format = 'stylo'">
                     <!-- author, file, div -->
-                    <xsl:value-of select="'stylo/'"/>
+                    <xsl:value-of select="concat('stylo/articles/w_',$p_minimal-article-length,'/')"/>
+                    <!--<xsl:message>
+                        <xsl:copy-of select="$v_author"/>
+                    </xsl:message>-->
                     <xsl:choose>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
+                        <xsl:when test="$v_author/descendant-or-self::tei:persName/@ref">
                             <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
-                            <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
+                            <xsl:value-of select="oape:query-personography($v_author/descendant-or-self::tei:persName[@ref][1],$v_personography,'oape','')"/>
                         </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
+                        <xsl:when test="$v_author/descendant-or-self::tei:surname">
+                            <xsl:value-of select="$v_author/descendant-or-self::tei:surname"/>
                         </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:persName"/>
+                        <xsl:when test="$v_author/descendant-or-self::tei:persName">
+                            <xsl:value-of select="$v_author/descendant-or-self::tei:persName"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:text>NN</xsl:text>
@@ -123,28 +75,31 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:result-document href="../_output/{$v_file-name}" method="text">
+        <xsl:variable name="v_length" select="number(count(tokenize(string(.), '\W+')))"/>
+        <!-- if the output format is 'stylo' then articles should be checked for minimum length -->
+        <xsl:choose>
+            <xsl:when test="$p_output-format = 'stylo'">
+                <xsl:if test="$v_length &gt;= $p_minimal-article-length">
+                    <xsl:result-document href="../_output/{$v_file-name}" method="text">
+                <!-- text body -->
+                    <xsl:apply-templates mode="m_markdown"/>
+                </xsl:result-document>
+                </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:result-document href="../_output/{$v_file-name}" method="text">
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
             <xsl:if test="$v_include-yaml = true()">
-            <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
-            <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace($vArticleTitle,'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPublicationTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
-            <xsl:text>author: </xsl:text><xsl:apply-templates select="$vAuthor" mode="m_markdown"/><xsl:value-of select="$v_new-line"/>
-            <xsl:text>date: </xsl:text><xsl:value-of select="$vPublDate/@when"/><xsl:value-of select="$v_new-line"/>
-            <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
-            <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
+                <xsl:copy-of select="oape:generate-yaml-for-div(.)"/>
             </xsl:if>
             <!-- text body -->
             <xsl:apply-templates mode="m_markdown"/>
             <!-- notes -->
-            <xsl:choose>
-                <xsl:when test="$p_output-format = 'stylo'"/>
-                <xsl:otherwise>
                     <xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
                     <xsl:call-template name="t_notes"/>
-                </xsl:otherwise>
-            </xsl:choose>
         </xsl:result-document>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
-
 
 </xsl:stylesheet>

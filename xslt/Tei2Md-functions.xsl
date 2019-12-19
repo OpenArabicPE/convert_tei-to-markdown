@@ -6,9 +6,7 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     version="3.0">
-    <!-- import functions -->
-    <xsl:import href="../../tools/xslt/openarabicpe_functions.xsl"/>
-    <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
+    <xsl:output method="text" encoding="UTF-8" indent="yes" omit-xml-declaration="yes" name="text"/>
     <xsl:strip-space elements="*"/>
     
     <xd:doc scope="stylesheet">
@@ -17,9 +15,11 @@
         </xd:desc>
     </xd:doc>
     
-    
+    <!-- import functions -->
     <xsl:include href="Tei2Md-parameters.xsl"/>
-    
+<!--    <xsl:include href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-csv_functions.xsl"/>-->
+        <!-- convert_tei-to-csv_functions includes all the following parameters -->
+    <xsl:import href="../../tools/xslt/openarabicpe_functions.xsl"/>
     <!-- locate authority files -->
     <xsl:param name="p_path-authority-files" select="'../../authority-files/data/tei/'"/>
     <xsl:param name="p_file-name-gazetteer" select="'gazetteer_levant-phd.TEIP5.xml'"/>
@@ -42,8 +42,8 @@
         <xsl:variable name="vBiblStructSource"
             select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:biblStruct[1]"/>
         <xsl:variable name="vPubTitle" select="$vBiblStructSource/tei:monogr/tei:title[@xml:lang=$vLang][not(@type='sub')][1]"/>
-<!--        <xsl:variable name="vAuthor1" select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>-->
-        <xsl:variable name="vAuthor">
+<!--        <xsl:variable name="v_editor1" select="$vSourceBibl/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]"/>-->
+        <xsl:variable name="v_editor">
             <xsl:choose>
                 <xsl:when test="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname">
                     <xsl:value-of select="$vBiblStructSource/tei:monogr/tei:editor/tei:persName[@xml:lang=$vLang]/tei:surname"/>
@@ -105,15 +105,15 @@
                     <!-- author, file, div -->
                     <xsl:value-of select="'stylo/'"/>
                     <xsl:choose>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName/@ref">
+                        <xsl:when test="$v_editor/descendant-or-self::tei:persName/@ref">
                             <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
-                            <xsl:value-of select="oape:query-personography($vAuthor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
+                            <xsl:value-of select="oape:query-personography($v_editor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
                         </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:surname">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:surname"/>
+                        <xsl:when test="$v_editor/descendant-or-self::tei:surname">
+                            <xsl:value-of select="$v_editor/descendant-or-self::tei:surname"/>
                         </xsl:when>
-                        <xsl:when test="$vAuthor/descendant-or-self::tei:persName">
-                            <xsl:value-of select="$vAuthor/descendant-or-self::tei:persName"/>
+                        <xsl:when test="$v_editor/descendant-or-self::tei:persName">
+                            <xsl:value-of select="$v_editor/descendant-or-self::tei:persName"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:text>NN</xsl:text>
@@ -331,5 +331,54 @@
     <!-- prevent output from sections of articles. Why would one do that? -->
 <!--    <xsl:template match="tei:div[@type = 'section'][ancestor::tei:div[@type = 'article']]" mode="mPlainText"/>-->
 
-
+    <xsl:function name="oape:generate-yaml-for-div">
+        <xsl:param name="p_input"/>
+        <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
+        <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace(oape:get-title-from-div($p_input),'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPubTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
+        <xsl:text>author: </xsl:text><xsl:value-of select="$v_new-line"/>
+        <xsl:text>    - </xsl:text><xsl:value-of select="oape:get-author-from-div($p_input)"/><xsl:value-of select="$v_new-line"/>
+        <xsl:text>    - </xsl:text><xsl:value-of select="$v_editor"/><xsl:value-of select="$v_new-line"/>
+        <xsl:text>date: </xsl:text><xsl:value-of select="$vPubDate"/><xsl:value-of select="$v_new-line"/>
+        <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',$p_input/@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
+        <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
+    </xsl:function>
+    <xsl:function name="oape:get-title-from-div">
+        <xsl:param name="p_input"/>
+            <xsl:if test="$p_input/@type = 'item' and $p_input/ancestor::tei:div[@type = 'section']">
+                <xsl:apply-templates select="$p_input/ancestor::tei:div[@type = 'section']/tei:head"
+                    mode="m_markdown"/>
+                <xsl:text>: </xsl:text>
+            </xsl:if>
+            <xsl:apply-templates select="$p_input/tei:head" mode="m_markdown"/>
+    </xsl:function>
+    <!-- function to get the author(s) of a div -->
+    <xsl:function name="oape:get-author-from-div">
+        <xsl:param name="p_input"/>
+        <xsl:choose>
+            <xsl:when
+                test="$p_input/child::tei:byline/descendant::tei:persName[not(ancestor::tei:note)]">
+                <xsl:copy-of
+                    select="$p_input/child::tei:byline/descendant::tei:persName[not(ancestor::tei:note)]"
+                />
+            </xsl:when>
+            <xsl:when
+                test="$p_input/child::tei:byline/descendant::tei:orgName[not(ancestor::tei:note)]">
+                <xsl:copy-of
+                    select="$p_input/child::tei:byline/descendant::tei:orgName[not(ancestor::tei:note)]"
+                />
+            </xsl:when>
+            <xsl:when
+                test="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author">
+                <xsl:copy-of
+                    select="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author/descendant::tei:persName"
+                />
+            </xsl:when>
+            <xsl:when
+                test="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']">
+                <xsl:copy-of
+                    select="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']"
+                />
+            </xsl:when>
+        </xsl:choose>
+    </xsl:function>
 </xsl:stylesheet>
