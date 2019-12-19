@@ -5,7 +5,7 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     version="2.0">
-    <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
+    <xsl:output method="text" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
     
     <xd:doc scope="stylesheet">
@@ -32,6 +32,7 @@
         </xsl:variable>
     <!-- values for $p_output-format are: md and stylo -->
     <xsl:param name="p_output-format" select="'stylo'"/>
+    <xsl:param name="p_minimal-article-length" select="1000"/>
     <xsl:param name="p_verbose" select="false()"/>
     <xsl:variable name="v_separator-attribute-key">
         <xsl:choose>
