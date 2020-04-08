@@ -16,6 +16,9 @@
     </xd:doc>
     
     <xsl:include href="Tei2Md-functions.xsl"/>
+    <!-- functions to generate YAML block -->
+    <xsl:include href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-biblstruct_functions.xsl"/>
+    <xsl:import href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-yaml_functions.xsl"/>
 
     <xsl:template match="/">
             <xsl:apply-templates select="descendant::tei:text" mode="m_markdown"/>
@@ -90,7 +93,9 @@
                 <xsl:result-document href="../_output/{$v_file-name}" method="text">
             <!-- some metadata on the file itself: YAML. In order to support pandoc conversions etc. the Yaml block should also containe a link to the BibTeX file identifying this article. -->
             <xsl:if test="$v_include-yaml = true()">
-                <xsl:copy-of select="oape:generate-yaml-for-div(.)"/>
+                <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
+                <xsl:copy-of select="oape:bibliography-tei-to-yaml(oape:bibliography-tei-div-to-biblstruct(.), @xml:lang)"/><xsl:value-of select="$v_new-line"/>
+                <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
             </xsl:if>
             <!-- text body -->
             <xsl:apply-templates mode="m_markdown"/>

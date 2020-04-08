@@ -330,55 +330,5 @@
     </xsl:template>
     <!-- prevent output from sections of articles. Why would one do that? -->
 <!--    <xsl:template match="tei:div[@type = 'section'][ancestor::tei:div[@type = 'article']]" mode="mPlainText"/>-->
-
-    <xsl:function name="oape:generate-yaml-for-div">
-        <xsl:param name="p_input"/>
-        <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/>
-        <xsl:text>title: "*</xsl:text><xsl:value-of select="normalize-space(replace(oape:get-title-from-div($p_input),'#',''))"/><xsl:text>*. </xsl:text><xsl:value-of select="$vPubTitle"/><xsl:text> </xsl:text><xsl:value-of select="$v_volume"/><xsl:text>(</xsl:text><xsl:value-of select="$v_issue"/><xsl:text>)</xsl:text><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
-        <xsl:text>author: </xsl:text><xsl:value-of select="$v_new-line"/>
-        <xsl:text>    - </xsl:text><xsl:value-of select="oape:get-author-from-div($p_input)"/><xsl:value-of select="$v_new-line"/>
-        <xsl:text>    - </xsl:text><xsl:value-of select="$v_editor"/><xsl:value-of select="$v_new-line"/>
-        <xsl:text>date: </xsl:text><xsl:value-of select="$vPubDate"/><xsl:value-of select="$v_new-line"/>
-        <xsl:text>bibliography: </xsl:text><xsl:value-of select="concat($v_id-file,'-',$p_input/@xml:id,'.bib')"/><xsl:value-of select="$v_new-line"/>
-        <xsl:text>---</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/>
-    </xsl:function>
-    <xsl:function name="oape:get-title-from-div">
-        <xsl:param name="p_input"/>
-            <xsl:if test="$p_input/@type = 'item' and $p_input/ancestor::tei:div[@type = 'section']">
-                <xsl:apply-templates select="$p_input/ancestor::tei:div[@type = 'section']/tei:head"
-                    mode="m_markdown"/>
-                <xsl:text>: </xsl:text>
-            </xsl:if>
-            <xsl:apply-templates select="$p_input/tei:head" mode="m_markdown"/>
-    </xsl:function>
-    <!-- function to get the author(s) of a div -->
-    <xsl:function name="oape:get-author-from-div">
-        <xsl:param name="p_input"/>
-        <xsl:choose>
-            <xsl:when
-                test="$p_input/child::tei:byline/descendant::tei:persName[not(ancestor::tei:note)]">
-                <xsl:copy-of
-                    select="$p_input/child::tei:byline/descendant::tei:persName[not(ancestor::tei:note)]"
-                />
-            </xsl:when>
-            <xsl:when
-                test="$p_input/child::tei:byline/descendant::tei:orgName[not(ancestor::tei:note)]">
-                <xsl:copy-of
-                    select="$p_input/child::tei:byline/descendant::tei:orgName[not(ancestor::tei:note)]"
-                />
-            </xsl:when>
-            <xsl:when
-                test="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author">
-                <xsl:copy-of
-                    select="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:author/descendant::tei:persName"
-                />
-            </xsl:when>
-            <xsl:when
-                test="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']">
-                <xsl:copy-of
-                    select="$p_input/descendant::tei:note[@type = 'bibliographic']/tei:bibl/tei:title[@level = 'j']"
-                />
-            </xsl:when>
-        </xsl:choose>
-    </xsl:function>
+   
 </xsl:stylesheet>
