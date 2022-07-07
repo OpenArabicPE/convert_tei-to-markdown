@@ -14,7 +14,9 @@
         </xd:desc>
     </xd:doc>
     
-    <xsl:variable name="v_url-file" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>
+    <!--<xsl:variable name="v_url-file" select="tei:TEI/tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno[@type='url']"/>-->
+    <xsl:param name="p_compile-serialised-articles" select="true()"/>
+    
     <xsl:variable name="v_new-line" select="'&#x0A;'"/>
     <xsl:param name="p_lang" select="'ar'"/>
     <xsl:param name="p_display-editorial-corrections" select="false()"/>

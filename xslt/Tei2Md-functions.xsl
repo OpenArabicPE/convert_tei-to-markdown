@@ -16,10 +16,11 @@
     </xd:doc>
     
     <!-- import functions -->
-    <xsl:include href="Tei2Md-parameters.xsl"/>
-<!--    <xsl:include href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-csv_functions.xsl"/>-->
-        <!-- convert_tei-to-csv_functions includes all the following parameters -->
-    <xsl:import href="../../tools/xslt/openarabicpe_functions.xsl"/>
+    <xsl:import href="Tei2Md-parameters.xsl"/>
+    <xsl:import href="../../authority-files/xslt/functions.xsl"/>
+    <!-- functions to generate YAML block -->
+    <xsl:include href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-biblstruct_functions.xsl"/>
+    <xsl:import href="../../convert_tei-to-bibliographic-data/xslt/convert_tei-to-yaml_functions.xsl"/>
     <!-- locate authority files -->
     <xsl:param name="p_path-authority-files" select="'../../authority-files/data/tei/'"/>
     <xsl:param name="p_file-name-gazetteer" select="'gazetteer_levant-phd.TEIP5.xml'"/>
@@ -31,8 +32,8 @@
         select="doc(concat($p_path-authority-files, $p_file-name-personography))"/>
     
     <!-- variables for normalizing arabic -->
-    <xsl:variable name="v_string-normalise-stylo-arabic-source" select="'اآأإئىؤة'"/>
-    <xsl:variable name="v_string-normalise-stylo-arabic-target" select="'ااااييوت'"/>
+    <xsl:variable name="v_string-normalise-stylo-arabic-source" select="'اآأإئىؤ'"/>
+    <xsl:variable name="v_string-normalise-stylo-arabic-target" select="'ااااييو'"/>
     <xsl:variable name="v_string-normalise-shamela-arabic-source" select="'اآأإ'"/>
     <xsl:variable name="v_string-normalise-shamela-arabic-target" select="'اااا'"/>
     
@@ -107,7 +108,7 @@
                     <xsl:choose>
                         <xsl:when test="$v_editor/descendant-or-self::tei:persName/@ref">
                             <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
-                            <xsl:value-of select="oape:query-personography($v_editor/descendant-or-self::tei:persName[1],$v_personography,'oape','')"/>
+                            <xsl:value-of select="oape:query-personography($v_editor/descendant-or-self::tei:persName[1],$v_personography,'oape', 'id-local', '')"/>
                         </xsl:when>
                         <xsl:when test="$v_editor/descendant-or-self::tei:surname">
                             <xsl:value-of select="$v_editor/descendant-or-self::tei:surname"/>
@@ -307,7 +308,6 @@
 
     <!-- plain text -->
     <xsl:template match="text()" mode="m_markdown m_plain-text" priority="10">
-        <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
         <xsl:variable name="v_self" select="normalize-space(.)"/>
         <xsl:choose>
             <xsl:when test="$p_output-format = 'stylo'">
@@ -317,6 +317,7 @@
                 <xsl:value-of select="$v_self"/>
             </xsl:otherwise>
         </xsl:choose>
+        <!-- in many instances adding whitespace before and after a text() node makes a lot of sense -->
         <xsl:choose>
              <xsl:when test="$v_self = ' '"/>
             <xsl:when test="ends-with($v_self,' ب')"/>
