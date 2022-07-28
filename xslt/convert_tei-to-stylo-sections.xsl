@@ -9,7 +9,7 @@
     <xsl:strip-space elements="*"/>
     <xd:doc scope="stylesheet">
         <xd:desc>
-            <xd:p>This stylesheet produces a simple markdown file from TEI XML input</xd:p>
+            <xd:p>This stylesheet produces a plain text file for each div[@type = 'section'] in the body of a TEI XML input</xd:p>
         </xd:desc>
     </xd:doc>
     <xsl:include href="Tei2Md-functions.xsl"/>
@@ -89,16 +89,4 @@
             <xsl:apply-templates mode="m_markdown" select="."/>
         </xsl:if>
     </xsl:template>
-    
-    <!-- provide a YAML header -->
-    <!--<xsl:template match="tei:teiHeader">
-        <xsl:if test="$v_include-yaml = true()">
-        <!-\- output -\->
-<xsl:text>-\-\-</xsl:text><xsl:value-of select="$v_new-line"/>
-<xsl:text>title: "</xsl:text><xsl:value-of select="$vPubTitle"/><xsl:text>"</xsl:text><xsl:value-of select="$v_new-line"/>
-<xsl:text>author: </xsl:text><xsl:value-of select="$vAuthor"/><xsl:value-of select="$v_new-line"/>
-<xsl:text>date: </xsl:text><xsl:value-of select="$vPubDate"/><xsl:value-of select="$v_new-line"/>
-<xsl:text>-\-\-</xsl:text><xsl:value-of select="$v_new-line"/><xsl:value-of select="$v_new-line"/> 
-        </xsl:if>
-    </xsl:template>-->
 </xsl:stylesheet>
