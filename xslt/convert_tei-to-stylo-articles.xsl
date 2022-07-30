@@ -36,7 +36,7 @@
                 </xsl:variable>
                 <xsl:variable name="v_length" select="number(count(tokenize(string($v_self), '\W+')))"/>
                 <xsl:message>
-                    <xsl:text>This div is </xsl:text>
+                    <xsl:text>The div '#</xsl:text><xsl:value-of select="@xml:id"/><xsl:text>' is </xsl:text>
                     <xsl:value-of select="$v_length"/>
                     <xsl:text> words long. The required length is </xsl:text><xsl:value-of select="$p_minimal-article-length"/>
                 </xsl:message>
@@ -53,7 +53,7 @@
                                 <xsl:when test="$v_author/descendant-or-self::tei:persName/@ref">
                                     <xsl:value-of select="concat('oape', $v_separator-attribute-value)"/>
                                     <!-- this should only select a single author -->
-                                    <xsl:value-of select="oape:query-personography($v_author/descendant-or-self::tei:persName[@ref][1], $v_personography, 'oape', 'id-local', '')"/>
+                                    <xsl:value-of select="oape:query-personography($v_author/$v_author[self::tei:persName/@ref][1], $v_personography, 'oape', 'id-local', '')"/>
                                 </xsl:when>
                                 <xsl:when test="$v_author/descendant-or-self::tei:surname">
                                     <xsl:value-of select="$v_author/descendant-or-self::tei:surname"/>
