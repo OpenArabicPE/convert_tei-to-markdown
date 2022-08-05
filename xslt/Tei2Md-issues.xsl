@@ -9,7 +9,7 @@
             <xd:p>This stylesheet produces a simple markdown file from TEI XML input</xd:p>
         </xd:desc>
     </xd:doc>
-    <xsl:include href="Tei2Md-functions.xsl"/>
+    <xsl:include href="functions.xsl"/>
     <!-- save as new file -->
     <xsl:template match="/">
         <xsl:result-document format="plain-text" href="../_output/{$v_file-name}">

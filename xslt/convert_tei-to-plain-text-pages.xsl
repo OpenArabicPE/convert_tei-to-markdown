@@ -7,7 +7,7 @@
             <xd:p>This stylesheet produces a simple plain text file for each page in an TEI XML input</xd:p>
         </xd:desc>
     </xd:doc>
-    <xsl:include href="Tei2Md-functions.xsl"/>
+    <xsl:include href="functions.xsl"/>
     <!-- variables -->
     <xsl:param name="p_min-section-length" select="3"/>
     <xsl:param name="p_output-path" select="'_output/plain-text_pages/'"/>

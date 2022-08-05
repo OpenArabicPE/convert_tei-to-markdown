@@ -12,7 +12,7 @@
             <xd:p>This stylesheet produces a plain text file for each div[@type = 'section'] in the body of a TEI XML input</xd:p>
         </xd:desc>
     </xd:doc>
-    <xsl:include href="Tei2Md-functions.xsl"/>
+    <xsl:include href="functions.xsl"/>
     <!-- variables -->
     <xsl:param name="p_minimal-section-length" select="3"/>
     <xsl:variable name="v_file-name">

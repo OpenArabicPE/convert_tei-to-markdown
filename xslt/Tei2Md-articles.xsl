@@ -8,7 +8,7 @@
             <xd:p>This stylesheet produces a simple markdown file from TEI XML input for every div in the body of the document</xd:p>
         </xd:desc>
     </xd:doc>
-    <xsl:include href="Tei2Md-functions.xsl"/>
+    <xsl:include href="functions.xsl"/>
     
     <xsl:template match="/">
         <xsl:apply-templates select="descendant::tei:text/tei:body/descendant::tei:div"/>
