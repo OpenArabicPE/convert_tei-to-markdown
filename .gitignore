@@ -1,0 +1,6 @@
+.DS_Store
+images
+images/
+*.scpt
+metadata/issues/
+_output/
